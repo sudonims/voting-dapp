@@ -8,7 +8,7 @@ struct Voter {
 
 struct Candidate {
     string candidate;
-    int256 count;
+    uint256 count;
     bool exists;
 }
 
@@ -39,13 +39,14 @@ contract Vote {
                 count[candidate] = Candidate(candidate, 0, true);
             }
             count[candidate].count++;
-            return ("succss");
+
+            return ("success");
         }
         return ("vote done");
     }
 
-    function getCount(string calldata candidate) public view returns (int256) {
-        int256 cnt = count[candidate].count;
+    function getCount(string calldata candidate) public view returns (uint256) {
+        uint256 cnt = count[candidate].count;
         return cnt;
     }
 }
