@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.11;
 
+import "./VoteToken.sol";
+
 struct Voter {
     address add;
     bool exists;
@@ -15,11 +17,13 @@ struct Candidate {
 contract Vote {
     mapping(string => Candidate) private count;
     string[] public candidateList; // Should be predefined list
+    VoteToken token;
 
     mapping(address => Voter) public votesDone;
 
     constructor() public {
         candidateList = [string("A"), "B"];
+        token = new VoteToken();
     }
 
     function getCandidates() public view returns (string[] memory) {
