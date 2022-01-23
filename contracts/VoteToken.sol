@@ -11,9 +11,7 @@ interface IERC20 {
         view
         returns (uint256);
 
-    function transfer(address recipient, uint256 amount)
-        external
-        returns (bool);
+    function transfer(address receiver, uint256 amount) external returns (bool);
 
     function approve(address spender, uint256 amount) external returns (bool);
 
@@ -56,8 +54,6 @@ contract VoteToken is IERC20 {
 
     uint256 totalSupply_;
 
-    // uint256 totalVotesDone;
-
     constructor() public {
         totalSupply_ = 100000000000;
         balances[msg.sender] = totalSupply_;
@@ -76,15 +72,15 @@ contract VoteToken is IERC20 {
         return balances[tokenOwner];
     }
 
-    function transfer(address receiver, uint256 numTokens)
+    function transfer(address receiver, uint256 amount)
         public
         override
         returns (bool)
     {
-        require(numTokens <= balances[msg.sender]);
-        balances[msg.sender] = balances[msg.sender].sub(numTokens);
-        balances[receiver] = balances[receiver].add(numTokens);
-        emit Transfer(msg.sender, receiver, numTokens);
+        require(amount <= balances[msg.sender]);
+        balances[msg.sender] = balances[msg.sender].sub(amount);
+        balances[receiver] = balances[receiver].add(amount);
+        emit Transfer(msg.sender, receiver, amount);
         return true;
     }
 

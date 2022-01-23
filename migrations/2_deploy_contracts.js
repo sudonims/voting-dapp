@@ -5,5 +5,5 @@ var VoteToken = artifacts.require("./VoteToken.sol");
 module.exports = function (deployer) {
   deployer.deploy(VoterData);
   deployer.deploy(Vote);
-  deployer.deploy(VoteToken);
+  // deployer.deploy(VoteToken);
 };

@@ -9,6 +9,7 @@ module.exports = {
       network_id: 5777,
       port: 7545,
       host: "127.0.0.1",
+      // gas: 3000000000000,
     },
   },
   compilers: {
@@ -18,6 +19,7 @@ module.exports = {
       settings: {
         optimizer: {
           enabled: true,
+          runs: 200,
         },
       },
     },
