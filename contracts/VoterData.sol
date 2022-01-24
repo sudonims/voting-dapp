@@ -20,7 +20,7 @@ contract VoterData {
         }
     }
 
-    function isAddressInUse(string calldata add) public view returns (bool) {
+    function isAddressInUse(string memory add) public view returns (bool) {
         return addressInUse[add] ? true : false;
     }
 }
