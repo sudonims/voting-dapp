@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.11;
 
-import "./VoterData.sol";
+interface VoterData {
+    function isAddressInUse(string memory add) external view returns (bool);
+}
 
 struct Voter {
     address add;
@@ -22,21 +24,24 @@ contract Vote {
 
     constructor() public {
         candidateList = [string("A"), "B"];
-        voterDataAddress = 0x94E55451Fba1803FB8D614663D0CC22d6F7c63a8;
+        voterDataAddress = 0x6b25Ac500EBBf158A02f6544f8fC3f1330D4F5aa;
     }
 
     function getCandidates() public view returns (string[] memory) {
         return candidateList;
     }
 
-    function toAsciiString(address x) internal pure returns (string memory) {
-        bytes memory s = new bytes(40);
+    function toAsciiString(address x) public view returns (string memory) {
+        x = msg.sender;
+        bytes memory s = new bytes(42);
+        s[0] = "0";
+        s[1] = "x";
         for (uint256 i = 0; i < 20; i++) {
             bytes1 b = bytes1(uint8(uint256(uint160(x)) / (2**(8 * (19 - i)))));
             bytes1 hi = bytes1(uint8(b) / 16);
             bytes1 lo = bytes1(uint8(b) - 16 * uint8(hi));
-            s[2 * i] = char(hi);
-            s[2 * i + 1] = char(lo);
+            s[2 * i + 2] = char(hi);
+            s[2 * i + 3] = char(lo);
         }
         return string(s);
     }
@@ -46,20 +51,25 @@ contract Vote {
         else return bytes1(uint8(b) + 0x57);
     }
 
-    modifier validVoter(string memory add) {
-        string memory a = "0x769043945515e7A25e8B9A4DD6a93f637B6b5F6e";
-        require(
-            keccak256(bytes(add)) == keccak256(bytes(a)),
-            "Not a valid Address"
-        );
-        _;
-    }
+    // modifier validVoter(string memory add) {
+    //     require( // string memory a = "0x769043945515e7A25e8B9A4DD6a93f637B6b5F6e";
+    //         keccak256(bytes(add)) == keccak256(bytes(a)),
+    //         "Not a valid Address"
+    //     );
+    //     _;
+    // }
 
     function castVote(string calldata candidate)
         public
         returns (string memory)
     {
         address voter = msg.sender;
+
+        bool isValid = VoterData(voterDataAddress).isAddressInUse(
+            toAsciiString(voter)
+        );
+
+        require(isValid == true, "Voter Not Valid");
 
         if (!votesDone[voter].exists) {
             votesDone[voter] = Voter(voter, true);
@@ -73,7 +83,11 @@ contract Vote {
         return ("vote done");
     }
 
-    function getCount(string calldata candidate) public view returns (int256) {
+    function getCount(string calldata candidate)
+        external
+        view
+        returns (int256)
+    {
         int256 cnt = count[candidate].count;
         return cnt;
     }
