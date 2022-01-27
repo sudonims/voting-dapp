@@ -48,6 +48,7 @@ contract VoteToken is IERC20 {
     string public constant name = "VoteToken";
     string public constant symbol = "VTKN";
     uint8 public constant decimals = 0;
+    address owner;
 
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
@@ -57,6 +58,7 @@ contract VoteToken is IERC20 {
     constructor() public {
         totalSupply_ = 100000000000;
         balances[msg.sender] = totalSupply_;
+        owner = msg.sender;
     }
 
     function totalSupply() public view override returns (uint256) {
@@ -77,10 +79,10 @@ contract VoteToken is IERC20 {
         override
         returns (bool)
     {
-        require(amount <= balances[msg.sender]);
-        balances[msg.sender] = balances[msg.sender].sub(amount);
-        balances[receiver] = balances[receiver].add(amount);
-        emit Transfer(msg.sender, receiver, amount);
+        require(amount <= balances[owner]);
+        balances[owner] = balances[owner].sub(amount);
+        balances[receiver] = amount;
+        emit Transfer(owner, receiver, amount);
         return true;
     }
 

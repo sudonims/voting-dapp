@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.11;
 
+import "./VoteToken.sol";
+
 interface VoterData {
     function isAddressInUse(string memory add) external view returns (bool);
 }
@@ -20,11 +22,13 @@ contract Vote {
     mapping(string => Candidate) private count;
     string[] public candidateList; // Should be predefined list
     address voterDataAddress;
+    address voterTokenAddress;
     mapping(address => Voter) public votesDone;
 
     constructor() public {
         candidateList = [string("A"), "B"];
         voterDataAddress = 0x6b25Ac500EBBf158A02f6544f8fC3f1330D4F5aa;
+        voterTokenAddress = 0x56C9F47BF43DCddc1CfA8f1e157f0f66E01c79E5;
     }
 
     function getCandidates() public view returns (string[] memory) {
@@ -78,6 +82,7 @@ contract Vote {
                 count[candidate] = Candidate(candidate, 0, true);
             }
             count[candidate].count++;
+            IERC20(voterTokenAddress).transfer(voter, 1);
             return ("success");
         }
         return ("vote done");
