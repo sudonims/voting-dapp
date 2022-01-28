@@ -2,19 +2,11 @@
 pragma solidity 0.8.11;
 
 import "./VoteToken.sol";
-
-interface VoterData {
-    function isAddressInUse(string memory add) external view returns (bool);
-}
-
-struct Voter {
-    address add;
-    bool exists;
-}
+import "./VoterData.sol";
 
 struct Candidate {
     string candidate;
-    int256 count;
+    uint256 count;
     bool exists;
 }
 
@@ -23,20 +15,14 @@ contract Vote {
     string[] public candidateList; // Should be predefined list
     address voterDataAddress;
     address voterTokenAddress;
-    mapping(address => Voter) public votesDone;
 
     constructor() public {
         candidateList = [string("A"), "B"];
-        voterDataAddress = 0x6b25Ac500EBBf158A02f6544f8fC3f1330D4F5aa;
-        voterTokenAddress = 0x56C9F47BF43DCddc1CfA8f1e157f0f66E01c79E5;
+        voterDataAddress = 0x0e96fCe59948455B1961D75505Ea198E06BdD7eC;
+        voterTokenAddress = 0x8fab6F8d9B6819Cf1fD886A3F558A77604f9dD07;
     }
 
-    function getCandidates() public view returns (string[] memory) {
-        return candidateList;
-    }
-
-    function toAsciiString(address x) public view returns (string memory) {
-        x = msg.sender;
+    function toAsciiString(address x) internal pure returns (string memory) {
         bytes memory s = new bytes(42);
         s[0] = "0";
         s[1] = "x";
@@ -55,45 +41,42 @@ contract Vote {
         else return bytes1(uint8(b) + 0x57);
     }
 
-    // modifier validVoter(string memory add) {
-    //     require( // string memory a = "0x769043945515e7A25e8B9A4DD6a93f637B6b5F6e";
-    //         keccak256(bytes(add)) == keccak256(bytes(a)),
-    //         "Not a valid Address"
-    //     );
-    //     _;
-    // }
+    modifier validVoter(address add) {
+        require(
+            VoterData(voterDataAddress).isAddressInUse(toAsciiString(add)) ==
+                true,
+            "Not a valid Address"
+        );
+        _;
+    }
 
     function castVote(string calldata candidate)
         public
+        validVoter(msg.sender)
         returns (string memory)
     {
         address voter = msg.sender;
 
-        bool isValid = VoterData(voterDataAddress).isAddressInUse(
-            toAsciiString(voter)
-        );
+        uint256 checkIfVoted = IERC20(voterTokenAddress).balanceOf(voter);
 
-        require(isValid == true, "Voter Not Valid");
+        require(checkIfVoted == 0, "Already Voted.");
 
-        if (!votesDone[voter].exists) {
-            votesDone[voter] = Voter(voter, true);
-
-            if (!count[candidate].exists) {
-                count[candidate] = Candidate(candidate, 0, true);
-            }
-            count[candidate].count++;
-            IERC20(voterTokenAddress).transfer(voter, 1);
-            return ("success");
+        if (!count[candidate].exists) {
+            count[candidate] = Candidate(candidate, 0, true);
         }
-        return ("vote done");
+        count[candidate].count++;
+        bool transferred = IERC20(voterTokenAddress).transfer(voter, 1);
+        require(transferred == true, "Transfer of token failed");
+
+        return ("success");
     }
 
-    function getCount(string calldata candidate)
-        external
-        view
-        returns (int256)
-    {
-        int256 cnt = count[candidate].count;
+    function getCount(string calldata candidate) public view returns (uint256) {
+        uint256 cnt = count[candidate].count;
         return cnt;
+    }
+
+    function getCandidates() public view returns (string[] memory) {
+        return candidateList;
     }
 }

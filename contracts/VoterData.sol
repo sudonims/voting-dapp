@@ -23,7 +23,7 @@ contract VoterData {
         return _b1;
     }
 
-    function registerNewVoter(string memory id, string memory add)
+    function registerNewVoter(string calldata id, string calldata add)
         public
         returns (string memory)
     {
@@ -36,7 +36,7 @@ contract VoterData {
         }
     }
 
-    function isAddressInUse(string memory add) external view returns (bool) {
+    function isAddressInUse(string calldata add) external view returns (bool) {
         return addressInUse[lower(add)] ? true : false;
     }
 }
