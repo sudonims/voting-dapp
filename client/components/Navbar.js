@@ -18,38 +18,35 @@ import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 import Web3 from "web3";
 import Web3Context from "../helpers/web3Context";
-
-const NavLink = ({ children }) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={"md"}
-    _hover={{
-      textDecoration: "none",
-      bg: useColorModeValue("gray.200", "gray.700"),
-    }}
-    href={"#"}
-  >
-    {children}
-  </Link>
-);
+import voterData from "../src/contracts/VoterData.json";
+import { VOTER_DATA_ADDRESS } from "../helpers/constants";
 
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode();
   const { web3, address, updateAddress, updateWeb3 } =
     React.useContext(Web3Context);
 
-  const signin = () => {
-    window.ethereum
-      ? ethereum
-          .request({ method: "eth_requestAccounts" })
-          .then((accounts) => {
-            updateAddress(accounts[0]);
-            let w3 = new Web3(ethereum);
-            updateWeb3(w3);
-          })
-          .catch((err) => console.log(err))
-      : console.log("Please install MetaMask");
+  const signin = async () => {
+    if (window.ethereum) {
+      var accounts = await ethereum.request({ method: "eth_requestAccounts" });
+      updateAddress(accounts[0]);
+      let w3 = new Web3(ethereum);
+      updateWeb3(w3);
+    } else {
+      console.log("Please install MetaMask");
+    }
+  };
+
+  const register = async () => {
+    let contract = new web3.eth.Contract(voterData.abi, VOTER_DATA_ADDRESS);
+    var result = await contract.methods
+      .registerNewVoter("abcd", address)
+      .send({
+        from: address,
+      })
+      .then((receipt) => receipt);
+
+    console.log(result);
   };
 
   const logout = () => {
@@ -97,6 +94,8 @@ export default function Nav() {
                     <Center padding={2}>
                       <p>{address}</p>
                     </Center>
+                    <br />
+                    <MenuItem onClick={register}>Register for Voting</MenuItem>
                     <br />
                     <MenuItem onClick={logout}>Logout</MenuItem>
                   </MenuList>

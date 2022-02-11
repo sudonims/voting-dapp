@@ -27,6 +27,8 @@ contract VoterData {
         public
         returns (string memory)
     {
+        require(!voterID[id], "Voter already registered");
+
         if (!voterID[id]) {
             voterID[id] = true;
             addressInUse[lower(add)] = true;
