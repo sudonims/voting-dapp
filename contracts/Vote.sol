@@ -18,8 +18,8 @@ contract Vote {
 
     constructor() public {
         candidateList = [string("A"), "B"];
-        voterDataAddress = 0x41B8Ee46507D59b9e430de2cE241cAdFa4b907E1;
-        voterTokenAddress = 0xaa28ac852BC20B314938e6DE4Af2CBE1d59319E7;
+        voterDataAddress = 0x99c53cd5Bce3E74965ca0624a03812984629f68D;
+        voterTokenAddress = 0x04b2B6FF0b94D2B68dC4fDa10863299E0cB4856D;
     }
 
     function toAsciiString(address x) internal pure returns (string memory) {

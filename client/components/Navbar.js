@@ -3,7 +3,6 @@ import {
   Box,
   Flex,
   Avatar,
-  Link,
   Button,
   Menu,
   MenuButton,
@@ -13,6 +12,7 @@ import {
   Stack,
   useColorMode,
   Center,
+  useToast,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
@@ -23,6 +23,7 @@ import { VOTER_DATA_ADDRESS } from "../helpers/constants";
 
 export default function Nav() {
   const { colorMode, toggleColorMode } = useColorMode();
+  const toast = useToast();
   const { web3, address, updateAddress, updateWeb3 } =
     React.useContext(Web3Context);
 
@@ -32,6 +33,13 @@ export default function Nav() {
       updateAddress(accounts[0]);
       let w3 = new Web3(ethereum);
       updateWeb3(w3);
+      toast({
+        title: "Sign in Success.",
+        description: "You can vote now",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
     } else {
       console.log("Please install MetaMask");
     }
@@ -39,12 +47,9 @@ export default function Nav() {
 
   const register = async () => {
     let contract = new web3.eth.Contract(voterData.abi, VOTER_DATA_ADDRESS);
-    var result = await contract.methods
-      .registerNewVoter("abcd", address)
-      .send({
-        from: address,
-      })
-      .then((receipt) => receipt);
+    var result = await contract.methods.registerNewVoter("abcd", address).send({
+      from: address,
+    });
 
     console.log(result);
   };

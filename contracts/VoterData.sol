@@ -23,19 +23,15 @@ contract VoterData {
         return _b1;
     }
 
-    function registerNewVoter(string calldata id, string calldata add)
-        public
-        returns (string memory)
-    {
+    event registrationDone(bool data);
+
+    function registerNewVoter(string calldata id, string calldata add) public {
         require(!voterID[id], "Voter already registered");
 
-        if (!voterID[id]) {
-            voterID[id] = true;
-            addressInUse[lower(add)] = true;
-            return ("success");
-        } else {
-            return ("Voter already registered");
-        }
+        voterID[id] = true;
+        addressInUse[lower(add)] = true;
+
+        emit registrationDone(true);
     }
 
     function isAddressInUse(string calldata add) external view returns (bool) {
