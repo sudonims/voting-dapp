@@ -42,16 +42,44 @@ export default function Nav() {
       });
     } else {
       console.log("Please install MetaMask");
+      toast({
+        title: "Unsupported",
+        description:
+          "Please try from web3 supported browser. Install metamask if needed",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
   const register = async () => {
-    let contract = new web3.eth.Contract(voterData.abi, VOTER_DATA_ADDRESS);
-    var result = await contract.methods.registerNewVoter("abcd", address).send({
-      from: address,
-    });
+    try {
+      let contract = new web3.eth.Contract(voterData.abi, VOTER_DATA_ADDRESS);
+      var result = await contract.methods
+        .registerNewVoter("bcde", address)
+        .send({
+          from: address,
+        });
 
-    console.log(result);
+      if ("registrationDone" in result.events) {
+        toast({
+          title: "Voter Registered",
+          description: "Successfully registered with contract",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      toast({
+        title: "Error Occured",
+        description: "Couldn't register voter.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   const logout = () => {
